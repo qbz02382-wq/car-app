@@ -1,0 +1,5 @@
+{
+  "name": "car-App",
+  "description": "A mobile-first smart parking management interface simulating a WeChat Mini Program experience.",
+  "requestFramePermissions": []
+}
