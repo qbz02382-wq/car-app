@@ -12,6 +12,9 @@ export default function App() {
   // 登录状态与角色状态
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   
+  // 全局余额状态，放在此处可以保证在页面切换（如从支付页返回首页再进入）时，金额不会丢失
+  const [userBalance, setUserBalance] = useState<number>(0.00);
+
   const [currentTab, setCurrentTab] = useState<TabView>('index');
   const [currentView, setCurrentView] = useState<PageView>('index');
 
@@ -79,7 +82,13 @@ export default function App() {
         {currentView === 'index' && <Home onNavigate={navigateTo} />}
         {currentView === 'find-car' && <FindCar />}
         {currentView === 'dashboard' && <Dashboard userRole={userRole} />}
-        {currentView === 'payment' && <Payment onSuccess={navigateBack} />}
+        {currentView === 'payment' && (
+          <Payment 
+            balance={userBalance} 
+            onUpdateBalance={setUserBalance} 
+            onSuccess={navigateBack} 
+          />
+        )}
       </main>
 
       {/* 底部 TabBar - 仅在 Tab 页面显示 */}

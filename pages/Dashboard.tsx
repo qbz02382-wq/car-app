@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TrendingUp, DollarSign, Car, Calendar, Clock, CreditCard } from 'lucide-react';
 import { THEME, UserRole } from '../types';
-import { MOCK_STATS, REVENUE_CHART_DATA, MOCK_RECORDS } from '../constants';
+import { MOCK_STATS, REVENUE_CHART_DATA, WEEKLY_REVENUE_DATA, MOCK_RECORDS } from '../constants';
 
 interface DashboardProps {
   userRole?: UserRole;
@@ -10,8 +10,12 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
   const isUser = userRole === 'user';
   
-  // 图表辅助数据
-  const maxRevenue = Math.max(...REVENUE_CHART_DATA.map(d => d.value));
+  // 管理员视图状态：图表时间范围
+  const [chartPeriod, setChartPeriod] = useState<'today' | 'week'>('today');
+
+  // 获取当前图表数据
+  const currentChartData = chartPeriod === 'today' ? REVENUE_CHART_DATA : WEEKLY_REVENUE_DATA;
+  const maxRevenue = Math.max(...currentChartData.map(d => d.value));
 
   // 管理员视图组件
   const AdminDashboard = () => (
@@ -56,30 +60,40 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
       {/* 时段收入统计柱状图 */}
       <div className="bg-white rounded-[24px] p-5 shadow-sm mt-4 border border-gray-50">
          <div className="flex justify-between items-center mb-6">
-             <h3 className="text-sm font-bold text-gray-800">时段收入统计</h3>
-             <div className="flex gap-2">
-                 <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] font-medium">今日</span>
-                 <span className="px-2 py-0.5 rounded text-gray-400 text-[10px]">近7天</span>
+             <h3 className="text-sm font-bold text-gray-800">收入统计趋势</h3>
+             <div className="flex gap-2 bg-gray-50 p-1 rounded-lg">
+                 <button 
+                    onClick={() => setChartPeriod('today')}
+                    className={`px-3 py-1 rounded-md text-[10px] font-medium transition-all ${chartPeriod === 'today' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400'}`}
+                 >
+                    今日
+                 </button>
+                 <button 
+                    onClick={() => setChartPeriod('week')}
+                    className={`px-3 py-1 rounded-md text-[10px] font-medium transition-all ${chartPeriod === 'week' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400'}`}
+                 >
+                    近7天
+                 </button>
              </div>
          </div>
          
          <div className="h-48 flex items-end justify-between px-2">
-            {REVENUE_CHART_DATA.map((item, index) => {
+            {currentChartData.map((item, index) => {
                 const heightPercentage = (item.value / maxRevenue) * 100;
                 return (
                     <div key={index} className="flex flex-col items-center gap-2 group w-8">
                         <div className="relative w-full flex justify-center">
-                            <div className="absolute -top-6 text-[10px] font-bold text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="absolute -top-6 text-[10px] font-bold text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">
                                 {item.value}
                             </div>
                             <div 
                                 className="w-4 bg-blue-200 rounded-t-lg group-hover:bg-blue-400 transition-all duration-300 relative overflow-hidden"
-                                style={{ height: `${heightPercentage * 1.2}px` }} 
+                                style={{ height: `${Math.max(4, heightPercentage * 1.2)}px` }} 
                             >
                                 <div className="absolute bottom-0 left-0 right-0 h-full w-full bg-gradient-to-t from-blue-300 to-transparent opacity-50"></div>
                             </div>
                         </div>
-                        <span className="text-[10px] text-gray-400">{item.time}</span>
+                        <span className="text-[10px] text-gray-400 whitespace-nowrap scale-90">{item.time}</span>
                     </div>
                 )
             })}
