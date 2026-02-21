@@ -52,11 +52,11 @@ export default function App() {
 
   const getHeaderTitle = () => {
     switch (currentView) {
-      case 'index': return '智能停车场';
+      case 'index': return '智慧停车场';
       case 'find-car': return '寻车导航';
       case 'dashboard': return userRole === 'admin' ? '数据看板' : '停车记录';
       case 'payment': return '停车缴费';
-      default: return '智能停车场';
+      default: return '智慧停车场';
     }
   };
 
